@@ -1,0 +1,27 @@
+{
+  "name": "gossipgrid",
+  "version": "1.0.0",
+  "description": "Group chat App",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/Mukulpathak4/Group-Chat.git"
+  },
+  "author": "MP",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Mukulpathak4/Group-Chat/issues"
+  },
+  "homepage": "https://github.com/Mukulpathak4/Group-Chat#readme",
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "express": "^4.18.2",
+    "mysql2": "^3.6.1",
+    "nodemon": "^3.0.1",
+    "sequelize": "^6.33.0"
+  }
+}

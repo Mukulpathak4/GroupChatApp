@@ -1,46 +1,36 @@
-// Clear the console (not related to the code's functionality but useful for debugging)
-console.clear();
+const signupButton = document.getElementById("signUpBtn");
 
-// Get references to the login and signup buttons from the HTML document.
-const loginBtn = document.getElementById('login');
-const signupBtn = document.getElementById('signup');
+const signUpName = document.getElementById("signupName"); // Assuming there's a name input field
+const signUpEmail = document.getElementById("signupEmail");
+const signUpPassword = document.getElementById("signupPassword");
+const signUpPhoneNumber = document.getElementById("signupphonenumber");
 
-// Add a click event listener to the login button.
-loginBtn.addEventListener('click', (e) => {
-	// Get the parent element of the clicked button (likely a div or container).
-	let parent = e.target.parentNode.parentNode;
 
-	// Use Array.from() to convert the classList of the parent element to an array and find a specific class.
-	Array.from(e.target.parentNode.parentNode.classList).find((element) => {
-		// Check if the found class is not "slide-up".
-		if (element !== "slide-up") {
-			// If it's not "slide-up", add the "slide-up" class to the parent element, triggering a slide-up animation.
-			parent.classList.add('slide-up');
-		} else {
-			// If it is "slide-up," it means the form is currently in the signup state.
-			// In that case, add the "slide-up" class to the signup button's parent and remove it from the parent element.
-			signupBtn.parentNode.classList.add('slide-up');
-			parent.classList.remove('slide-up');
-		}
-	});
-});
+function signup(){
+    const signUpDetails = {
+       name: signUpName.value, // Get the name from the name input field
+       email: signUpEmail.value, // Get the email from the signupEmail input field
+       password: signUpPassword.value, // Get the password from the signupPassword input field
+       phoneNumber: signUpPhoneNumber.value
+    };
 
-// Add a click event listener to the signup button (similar logic but in reverse).
-signupBtn.addEventListener('click', (e) => {
-	// Get the parent element of the clicked button.
-	let parent = e.target.parentNode;
+    axios
+    .post("http://localhost:3000/signUp", signUpDetails)
+    .then((result)=>{
+        alert('SignUp Complete.');
 
-	// Use Array.from() to convert the classList of the parent element to an array and find a specific class.
-	Array.from(e.target.parentNode.classList).find((element) => {
-		// Check if the found class is not "slide-up".
-		if (element !== "slide-up") {
-			// If it's not "slide-up", add the "slide-up" class to the parent element, triggering a slide-up animation.
-			parent.classList.add('slide-up');
-		} else {
-			// If it is "slide-up," it means the form is currently in the login state.
-			// In that case, add the "slide-up" class to the login button's parent and remove it from the parent element.
-			loginBtn.parentNode.parentNode.classList.add('slide-up');
-			parent.classList.remove('slide-up');
-		}
-	});
-});
+        window.location.href = "/";
+    })
+    .catch((error)=>{
+        if(error.response){
+            const errorMessage = error.response.data.message;
+            alert(`Here is error`);
+        }
+        else {
+            alert("Oops Error occurred Try Again.")
+        }
+    });
+}
+
+signupButton.addEventListener("click", signup);
+
