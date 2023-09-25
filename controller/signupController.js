@@ -1,6 +1,13 @@
 const path = require("path");
 const User = require("../models/signupModels");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+
+
+function generateAccessToken(id, email) {
+  // Create a JWT token with user information and the correct secret key.
+  return jwt.sign({ userId: id, email: email }, process.env.TOKEN_SECRET);
+}
 
 const getSignUpPage = (req, res, next) => {
   // Send the login page HTML file to the client.

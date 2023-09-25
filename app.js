@@ -9,7 +9,8 @@ app.use(bodyParser.json());
 const signupRoutes = require("./routes/signupRoutes");
 const sequelize = require("./util/config");
 
-
+const cors = require("cors");
+require('dotenv').config(); // Load environment variables from .env file
 
 const PORT = 3000;
 
