@@ -1,105 +1,147 @@
-/* Reset some default styles */
-body, html {
-    margin: 0;
-    padding: 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-image: url("/img4.jpg");
+/* Global styles */
+body {
+  font-family: 'Arial', sans-serif;
+  background-color: #e5ddd5; /* WhatsApp background color */
+  margin: 0;
+  padding: 0;
 }
 
-/* Container styles */
-.container {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
-    background-color: white;
-    border-radius: 10px;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+.container-fluid {
+  padding: 0;
 }
 
-/* Navbar styles */
-.navbar {
-    background-color: #128C7E;
-    color: white;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 20px;
-    border-radius: 10px 10px 0 0;
+/* Left sidebar */
+.contacts_card {
+  height: 100%;
+  border-right: 1px solid #d6d6d6;
+  background-color: #f5f5f5; /* WhatsApp chat background color */
 }
 
-.navbar h1 {
-    margin: 0;
-    font-size: 24px;
+.search {
+  border-radius: 20px;
+  padding: 10px;
+  background-color: #f5f5f5; /* WhatsApp chat background color */
 }
 
-.buttons button {
-    background-color: #25D366;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    padding: 8px 16px;
-    margin-left: 10px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.3s ease-in-out;
+/* Contacts list */
+.contacts_body {
+  overflow-y: scroll;
+  max-height: calc(100vh - 80px); /* Adjust the maximum height as needed */
 }
 
-.buttons button:hover {
-    background-color: #128C7E;
+.contacts li {
+  list-style-type: none;
+  padding: 10px;
+  cursor: pointer;
+  border-bottom: 1px solid #d6d6d6;
+  background-color: #fff; /* WhatsApp chat item background color */
 }
 
-/* Chat styles */
+.contacts li:hover {
+  background-color: #e5ddd5; /* WhatsApp chat item hover background color */
+}
+
+/* Right chat section */
 .chat {
-    border: 1px solid #ddd;
-    min-height: 300px;
-    padding: 10px;
-    margin-top: 20px;
-    overflow-y: scroll;
-    border-radius: 0 0 10px 10px;
+  background-color: #fff;
+  border: 1px solid #d6d6d6;
 }
 
-.chat p {
-    margin: 5px 0;
+.msg_head {
+  background-color: #128c7e; /* WhatsApp chat header background color */
+  color: #fff;
+  padding: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-/* Input area styles */
-.input-area {
-    display: flex;
-    align-items: center;
-    margin-top: 20px;
+.msg_head span {
+  font-weight: bold;
 }
 
-textarea {
-    flex: 1;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    resize: none;
+.action_menu {
+  display: none;
+  position: absolute;
+  right: 10px;
+  top: 10px;
 }
 
-button {
-    background-color: #25D366;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    padding: 10px 20px;
-    margin-left: 10px;
-    cursor: pointer;
-    transition: background-color 0.3s ease-in-out;
+.action_menu ul {
+  list-style-type: none;
+  padding: 0;
 }
 
-button:hover {
-    background-color: #128C7E;
+.action_menu li {
+  padding: 10px;
+  cursor: pointer;
+}
+
+.action_menu li:hover {
+  background-color: #f0f0f0;
+}
+
+/* Chat messages */
+.msg_card_body {
+  overflow-y: scroll;
+  max-height: calc(100vh - 150px); /* Adjust the maximum height as needed */
+  padding: 15px;
+}
+
+.msg_cotainer,
+.msg_cotainer_send {
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 10px;
+  max-width: 70%;
+}
+
+.msg_cotainer {
+  background-color: #f2f3f5; /* WhatsApp chat message background color */
+}
+
+.msg_cotainer_send {
+  background-color: #128c7e; /* WhatsApp chat sent message background color */
+  color: #fff;
+  align-self: flex-end;
+}
+
+.msg_time {
+  font-size: 12px;
+  color: #777777;
+  margin-left: 10px;
+}
+
+/* Message input area */
+.type_msg {
+  resize: none;
+  border: none;
+  padding: 10px;
+  width: 100%;
+  height: 50px;
+  border-top: 1px solid #d6d6d6;
+  background-color: #fff; /* WhatsApp chat input background color */
+  font-family: 'Arial', sans-serif;
+}
+
+.attach_btn {
+  cursor: pointer;
+  background-color: #fff; /* WhatsApp chat input background color */
+}
+
+.send_btn {
+  cursor: pointer;
+  background-color: #128c7e; /* WhatsApp send button background color */
+  color: #fff;
 }
 
 /* Responsive styles */
-@media (max-width: 600px) {
-    .navbar {
-        flex-direction: column;
-        align-items: flex-start;
-    }
+@media (max-width: 768px) {
+  .contacts_card {
+    display: none;
+  }
 
-    .buttons {
-        margin-top: 10px;
-    }
+  .chat {
+    border-left: none;
+  }
 }

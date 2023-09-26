@@ -7,14 +7,22 @@ app.use(bodyParser.json());
 
 
 const signupRoutes = require("./routes/signupRoutes");
+const homeRoutes = require("./routes/homeRoutes")
 const sequelize = require("./util/config");
 
-const cors = require("cors");
+const chatRouter = require("./routes/chatRoutes");
+
+// const cors = require("cors");
 require('dotenv').config(); // Load environment variables from .env file
 
 const PORT = 3000;
 
+
 app.use("/", signupRoutes);
+
+app.use("/home", homeRoutes);
+
+app.use("/chat", chatRouter);
 
 sequelize
   .sync() // This method synchronizes the database schema with the defined models.

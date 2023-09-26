@@ -27,7 +27,7 @@ function login() {
       localStorage.setItem("token", result.data.token);
 
       // Redirect to the home page.
-      window.location.href = "/";
+      window.location.href = "/home";
     })
     .catch((error) => {
       if (error.response) {

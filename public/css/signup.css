@@ -3,7 +3,7 @@
 html,body {
 	position: relative;
 	min-height: 100vh;
-	background-color: #3d85f9; /* WhatsApp background color */
+	background-color: #11600b; /* WhatsApp background color */
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -67,7 +67,7 @@ html,body {
 		}
 		
 		.form-title {
-			color: #0077b5; /* WhatsApp link color */
+			color: #235024; 
 			font-size: 1.7em;
 			text-align: center;
 			
@@ -110,8 +110,8 @@ html,body {
 		}
 		
 		.submit-btn {
-			background-color: #0077b5;
-			color: #fff;
+			background-color: #0ff15a;
+			color: #10230b;
 			border: 0;
 			border-radius: 15px;
 			display: block;
@@ -166,7 +166,7 @@ html,body {
 			transition: all .3s ease;
 			
 			.form-title {
-				color: #0077b5; /* WhatsApp link color */
+				color: #153418; /* WhatsApp link color */
 				font-size: 1.7em;
 				text-align: center;
 
@@ -210,8 +210,8 @@ html,body {
 			}
 
 			.submit-btn {
-				background-color: #0077b5;
-				color: #fff;
+				background-color: #0ff15a;
+			color: #10230b;
 				border: 0;
 				border-radius: 15px;
 				display: block;
@@ -271,7 +271,7 @@ body {
     margin: 0;
     padding: 0;
     font-family: 'Fira Sans', Helvetica, Arial, sans-serif;
-    background-color: #3d85f9; /* WhatsApp background color */
+    background-color: #11600b; /* WhatsApp background color */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -290,7 +290,7 @@ body {
 
 /* Navbar styles */
 .navbar {
-    background-color: #0077b5; /* WhatsApp navbar color */
+    background-color: #34a957; /* WhatsApp navbar color */
     color: #fff;
     padding: 10px;
 }
@@ -323,7 +323,7 @@ body {
 /* Form styles */
 .form-label {
     font-weight: bold;
-    color: #0077b5; /* WhatsApp link color */
+    color: #1cac23; /* WhatsApp link color */
 }
 
 .form-control {
@@ -336,7 +336,7 @@ body {
 }
 
 .showBtn {
-    background-color: #0077b5; /* WhatsApp button color */
+    background-color: #0ef75c; /* WhatsApp button color */
     color: #fff;
     border: none;
     padding: 10px 20px;
@@ -375,7 +375,7 @@ body {
     border-top: 1px solid #ddd;
     padding: 10px 0;
     text-align: center;
-    color: #0077b5; /* WhatsApp link color */
+    color: #49254803; /* WhatsApp link color */
 }
 
 /* Links */
