@@ -22,30 +22,34 @@ const postUserSignUp = async (req, res, next) => {
     const password = req.body.password;
     const phoneNumber = req.body.phoneNumber;
 
-    // Check if a user with the same email already exists in the database.
-    const existingUser = await User.findOne({ where: { email: email } });
-
-    if (existingUser) {
-      // If a user with the same email exists, send a conflict (status 409) response.
-      return res.status(409).json({ message: 'User Already Exist Try Login!' });
-    }
-
-    // If no user with the same email exists, hash the user's password securely.
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Create a new user record in the database.
-    await User.create({
-      name: name,
-      email: email,
-      password: hashedPassword,
-      phoneNumber: phoneNumber
+    const existingUser = await User.findOne({
+      where: {
+        [Op.or]: [{ email }, { number }],
+      },
     });
 
-    // Send a success (status 200) response after user creation.
-    return res.status(200).send(
-      `<script>alert('User Created Successfully!'); window.location.href='/'</script>`
-    );
-  } catch (err) {
+    if (existingUser) {
+      res
+        .status(409)
+        .send(
+          `<script>alert('This email or number is already taken. Please choose another one.'); window.location.href='/'</script>`
+        );
+    } else {
+      bcrypt.hash(password, 10, async (err, hash) => {
+        await User.create({
+          name: name,
+          email: email,
+          number: phoneNumber,
+          password: hash,
+        });
+      });
+      res
+        .status(200)
+        .send(
+          `<script>alert('User Created Successfully!'); window.location.href='/'</script>`
+        );
+    }
+   } catch (err) {
     console.error(err);
     res.status(500).send("Oops Error Occurred Try Again!");
   }
