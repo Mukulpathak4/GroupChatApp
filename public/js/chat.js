@@ -7,6 +7,7 @@ async function messageSend() {
   try {
     const message = messageTextArea.value;
     const token = localStorage.getItem("token");
+    messageTextArea.value = "";
     const res = await axios.post(
       "http://localhost:3000/chat/sendMessage",
       {
@@ -14,7 +15,7 @@ async function messageSend() {
       },
       { headers: { Authorization: token } }
     );
-      messageTextArea.value = "";
+      
   } catch (error) {
     console.log("something went wrong");
   }
@@ -104,6 +105,6 @@ async function getMessages() {
     console.log(error);
   }
 }
-
+setInterval(getMessages, 1000);
 messageSendBtn.addEventListener("click", messageSend);
 document.addEventListener("DOMContentLoaded", getMessages);
