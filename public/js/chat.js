@@ -8,6 +8,7 @@ async function messageSend() {
     const message = messageTextArea.value;
     const token = localStorage.getItem("token");
     messageTextArea.value = "";
+
     const res = await axios.post(
       "http://localhost:3000/chat/sendMessage",
       {
@@ -15,11 +16,18 @@ async function messageSend() {
       },
       { headers: { Authorization: token } }
     );
-      
+
+    if (res.status === 200) {
+      // Refresh the page on success
+      location.reload();
+    } else {
+      console.log("Failed to send message");
+    }
   } catch (error) {
-    console.log("something went wrong");
+    console.log("Something went wrong:", error);
   }
 }
+
 
 function decodeToken(token) {
   const base64Url = token.split(".")[1];
@@ -105,6 +113,21 @@ async function getMessages() {
     console.log(error);
   }
 }
-setInterval(getMessages, 1000);
+getMessages();
 messageSendBtn.addEventListener("click", messageSend);
 document.addEventListener("DOMContentLoaded", getMessages);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
