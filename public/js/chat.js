@@ -36,17 +36,19 @@ async function getMessagesFromDatabaseAndStore() {
 
 // Function to get messages from local storage and add the newly sent message
 function getMessagesFromLocalStorageAndAddNew(newMessage) {
-  const storedMessages = localStorage.getItem("messages");
+  let storedMessages = localStorage.getItem("messages");
+  let messages = [];
+
   if (storedMessages) {
-    const messages = JSON.parse(storedMessages);
-    messages.push(newMessage); // Add the new message to the existing stored messages
-    displayMessages(messages);
-  } else {
-    const messages = JSON.parse(storedMessages);
-    messages.push(newMessage);
-    displayMessages(messages); // Show only the new message
+    messages = JSON.parse(storedMessages);
   }
+
+  messages.push(newMessage); // Add the new message to the existing stored messages
+  localStorage.setItem("messages", JSON.stringify(messages)); // Update the stored messages
+
+  displayMessages(messages); // Display all messages including the new one
 }
+
 
 
 // Function to display messages in the chat box
