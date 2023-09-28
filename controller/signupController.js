@@ -2,6 +2,8 @@ const path = require("path");
 const User = require("../models/signupModels");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const { Op } = require("sequelize");
+
 
 
 function generateAccessToken(id, email) {
