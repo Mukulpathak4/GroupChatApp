@@ -1,138 +1,196 @@
-const messageTextArea = document.getElementById("messageTextArea");
-const messageSendBtn = document.getElementById("messageSendBtn");
-const chatBoxBody = document.getElementById("chatBoxBody");
 
+async function sendMsg() {
 
+    const msg = document.getElementById("messageInput").value;
+    const token = localStorage.getItem("token")
 
-function decodeToken(token) {
-  const base64Url = token.split(".")[1];
-  const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
-  const jsonPayload = decodeURIComponent(
-    atob(base64)
-      .split("")
-      .map(function (c) {
-        return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
-      })
-      .join("")
-  );
-
-  return JSON.parse(jsonPayload);
-}
-// Function to get messages from the database and store them in local storage
-async function getMessagesFromDatabaseAndStore() {
-  try {
-    if(done==true){
-    const res = await axios.get("http://localhost:3000/chat/getMessages");
-    const messages = res.data.messages;
-    localStorage.setItem("messages", JSON.stringify(messages)); // Store messages in local storage
-    displayMessages(messages);
-    done=false;
-  }else{
-    getMessagesFromLocalStorageAndAddNew();
-  }} catch (error) {
-    console.log(error);
-  }
-}
-
-// Function to get messages from local storage and add the newly sent message
-function getMessagesFromLocalStorageAndAddNew(newMessage) {
-  let storedMessages = localStorage.getItem("messages");
-  let messages = [];
-
-  if (storedMessages) {
-    messages = JSON.parse(storedMessages);
-  }
-
-  messages.push(newMessage); // Add the new message to the existing stored messages
-  localStorage.setItem("messages", JSON.stringify(messages)); // Update the stored messages
-
-  displayMessages(messages); // Display all messages including the new one
-}
-
-
-
-// Function to display messages in the chat box
-function displayMessages(messages) {
-  const token = localStorage.getItem("token");
-  const decodedToken = decodeToken(token);
-  const userId = decodedToken.userId;
-  chatBoxBody.innerHTML = "";
-
-  messages.forEach((message) => {
-    const div = document.createElement("div");
-    chatBoxBody.appendChild(div);
-
-    const messageSendby = document.createElement("span");
-    messageSendby.classList.add(
-      "d-flex",
-      message.userId === userId ? "justify-content-end" : "justify-content-start",
-      "px-3",
-      "mb-1",
-      "text-uppercase",
-      "small",
-      "text-white"
-    );
-    messageSendby.appendChild(document.createTextNode(message.userId === userId ? "You" : message.name));
-    div.appendChild(messageSendby);
-
-    const messageBox = document.createElement("div");
-    const messageText = document.createElement("div");
-
-    messageBox.classList.add(
-      "d-flex",
-      message.userId === userId ? "justify-content-end" : "justify-content-start",
-      "mb-4"
-    );
-
-    messageText.classList.add(
-      message.userId === userId ? "msg_cotainer_send" : "msg_cotainer"
-    );
-    messageText.appendChild(document.createTextNode(message.message));
-
-    messageBox.appendChild(messageText);
-    div.appendChild(messageBox);
-  });
-}
-
-
-// Function to send a message
-async function messageSend() {
-  try {
-    const messageContent = messageTextArea.value; // Extract the message content
-    const token = localStorage.getItem("token");
-    messageTextArea.value = "";
-
-    const res = await axios.post(
-      "http://localhost:3000/chat/sendMessage",
-      {
-        message: messageContent, // Pass the message content
-      },
-      { headers: { Authorization: token } }
-    );
-
-    if (res.status === 200) {
-      // After sending a message, create a complete message object and then call the function
-      const token = localStorage.getItem("token");
-      const decodedToken = decodeToken(token);
-      const userId = decodedToken.userId;
-      const newMessage = {
-        userId: userId,
-        name: "YourName", // Replace with the sender's name
-        message: messageContent,
-      };
-      getMessagesFromLocalStorageAndAddNew(newMessage);
-    } else {
-      console.log("Failed to send message");
+    if (!msg) {
+        return
     }
-  } catch (error) {
-    console.log("Something went wrong:", error);
-  }
+    try {
+
+        await axios.post("http://localhost:3000/send-msg", {
+            msg: msg
+        }, { headers: { "Authorization": token } })
+
+        document.getElementById("messageInput").value = "";
+
+    }
+
+    catch (err) {
+        console.log(err);
+    }
+
+}
+
+async function DOMloadChat(grpid) {
+    const token = localStorage.getItem("token");
+    const localChats = localStorage.getItem(`localChats${grpid}`);
+    let lastMsgId;
+    document.getElementById("chatBoxBody").innerHTML = "";
+    
+    if (localChats == undefined) {
+        const getAllChats = await axios.get("http://localhost:3000/getAllChats",
+            { headers: { "Authorization": token } });
+        const arrLen = getAllChats.data.allChat.length;
+
+        if (arrLen < 1) {
+            return
+        }
+        getAllChats.data.allChat.forEach((item) => {
+            lastMsgId = item.id;
+            appendChatToPage(item.message, item.user.name);
+        })
+        localStorage.setItem(`lastMsgId${grpid}`, lastMsgId);
+
+        if (arrLen > 10) {
+            localStorage.setItem(`localChats${grpid}`, JSON.stringify(getAllChats.data.allChat.slice(arrLen - 10, arrLen)));
+        }
+        else {
+            localStorage.setItem(`localChats${grpid}`, JSON.stringify(getAllChats.data.allChat));
+        }
+    }
+
+    else {
+
+        const parsedChats = JSON.parse(localChats);
+
+        parsedChats.forEach((item) => {
+            lastMsgId = item.id;
+            appendChatToPage(item.message, item.user.name);
+        })
+        localStorage.setItem(`lastMsgId${grpid}`, lastMsgId);
+
+    }
+    await getUpdatedChats(grpid);
+}
+
+async function getUpdatedChats(grpid) {
+    let lastMsgId = localStorage.getItem(`lastMsgId${grpid}`) || 0;
+    let token = localStorage.getItem("token")
+
+    if (grpid == 1) {
+        const result = await axios.get(`http://localhost:3000/getGroupToken/${grpid}`,
+            { headers: { "Authorization": token } });
+        token = result.data.token;
+    }
+
+    localStorage.setItem("token", token);
+
+    const updatedMsg = await axios.get(`http://localhost:3000/getUpdate/${lastMsgId}`,
+        { headers: { "Authorization": token } });
+
+    if (updatedMsg.data.updatedChat.length > 0) {
+        let UpdatedMsgId;
+        let arrlocalChats;
+        if (!localStorage.getItem(`localChats${grpid}`)) {
+            arrlocalChats = [];
+        }
+        else {
+            arrlocalChats = JSON.parse(localStorage.getItem(`localChats${grpid}`));
+        }
+
+        updatedMsg.data.updatedChat.forEach((item) => {
+            arrlocalChats.push(item);
+            UpdatedMsgId = item.id;
+            appendChatToPage(item.message, item.user.name);
+        })
+
+        localStorage.setItem(`lastMsgId${grpid}`, UpdatedMsgId);
+
+        const arrLen = arrlocalChats.length;
+        if (arrLen > 10) {
+            const stringifiedArr = JSON.stringify(arrlocalChats.slice(arrLen - 10, arrLen));
+            localStorage.setItem(`localChats${grpid}`, stringifiedArr);
+        }
+        else {
+            localStorage.setItem(`localChats${grpid}`, JSON.stringify(arrlocalChats));
+        }
+    }
+}
+
+function appendChatToPage(message, name) {
+    const p = document.createElement("p");
+    p.className = "border "
+    p.appendChild(document.createTextNode(`${name}: ${message}`));
+    document.getElementById("chats").appendChild(p);
+}
+
+async function createGroup() {
+
+    try {
+        const groupName = document.getElementById("groupName").value;
+        const token = localStorage.getItem("token");
+        if (!groupName) {
+            throw new Error("Enter Group Name");
+            return
+        }
+        const result = await axios.post("http://localhost:3000/createGroup", { groupName: groupName }, { headers: { "Authorization": token } });
+
+        console.log(result)
+        const { groupid, groupname } = result.data.result;
+
+        appendGroupToPage(groupname, groupid);
+    }
+    catch (err) {
+        console.log(err);
+    }
+}
+
+async function DOMloadGroups() {
+    const token = localStorage.getItem("token");
+    const getGroups = await axios.get("http://localhost:3000/getAllGroups",
+        { headers: { "Authorization": token } });
+
+    document.getElementById("groups").innerHTML = "";
+
+    if (getGroups.data.allGroups.length > 0) {
+        getGroups.data.allGroups.forEach((item) => {
+            appendGroupToPage(item.groupname, item.groupid);
+        })
+        document.getElementById("groups").addEventListener("click", onGroupClick);
+    }
+    else {
+        document.getElementById("groups").innerHTML = "<p>No groups found</p>";
+    }
+}
+
+function appendGroupToPage(groupname, groupid) {
+    const li = document.createElement("li");
+    li.appendChild(document.createTextNode(groupname));
+    li.name = groupname;
+    li.id = groupid;
+    li.className = "float-left"
+
+    const btnOpen = document.createElement("button");
+    btnOpen.className = "btn btn-sm btn-info float-right open";
+    btnOpen.appendChild(document.createTextNode("OpenChat"));
+
+    li.appendChild(btnOpen);
+    document.getElementById("groups").appendChild(li);
+}
+
+async function addmember() {
+    const member = document.getElementById("addmember").value;
+    const token = localStorage.getItem("token");
+    if (member) {
+        console.log(member);
+        try {
+            const result = await axios.post("http://localhost:3000/addmember", {
+                member: member
+            }, { headers: { "Authorization": token } });
+
+            window.alert("User Added");
+
+        }
+        catch (err) {
+            console.log(err);
+            if (err.response.status == 400 || err.response.status == 404) {
+                window.alert(err.response.data.message);
+            }
+        }
+
+    }
 }
 
 
-let done= true;
-
-// Event listeners
-messageSendBtn.addEventListener("click", messageSend);
-document.addEventListener("DOMContentLoaded", getMessagesFromDatabaseAndStore
-);

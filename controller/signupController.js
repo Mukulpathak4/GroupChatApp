@@ -1,5 +1,5 @@
 const path = require("path");
-const User = require("../models/signupModels");
+const User = require("../models/userModel");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { Op } = require("sequelize");
@@ -22,11 +22,11 @@ const postUserSignUp = async (req, res, next) => {
     const name = req.body.name;
     const email = req.body.email;
     const password = req.body.password;
-    const phoneNumber = req.body.phoneNumber;
+    const phone = req.body.phone;
 
     const existingUser = await User.findOne({
       where: {
-        [Op.or]: [{ email }, { phoneNumber }],
+        [Op.or]: [{ email }, { phone }],
       },
     });
 
@@ -41,7 +41,7 @@ const postUserSignUp = async (req, res, next) => {
         await User.create({
           name: name,
           email: email,
-          phoneNumber: phoneNumber,
+          phone: phone,
           password: hash,
         });
       });

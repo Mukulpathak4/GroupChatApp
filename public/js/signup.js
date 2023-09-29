@@ -49,7 +49,7 @@ function signup(){
        name: signUpName.value, // Get the name from the name input field
        email: signUpEmail.value, // Get the email from the signupEmail input field
        password: signUpPassword.value, // Get the password from the signupPassword input field
-       phoneNumber: signUpPhoneNumber.value
+       phone: signUpPhoneNumber.value
     };
 
     axios

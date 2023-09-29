@@ -1,19 +1,17 @@
+const {Sequelize} = require("sequelize");
 const sequelize = require("../util/config");
-const Sequelize = require("sequelize");
 
 const Chat = sequelize.define("chats", {
-  id: {
-    type: Sequelize.INTEGER,
-    allowNull: false,
-    autoIncrement: true,
-    primaryKey: true,
-  },
-  name: {
-    type: Sequelize.STRING,
-  },
-  message: {
-    type: Sequelize.STRING,
-  },
-});
+    id: {
+        type: Sequelize.INTEGER,
+        autoIncrement: true,
+        allowNull: false,
+        primaryKey: true
+    },
+    message:{
+        type:Sequelize.STRING,
+        allowNull:false
+    }
+})
 
-module.exports = Chat;
+module.exports=Chat;
