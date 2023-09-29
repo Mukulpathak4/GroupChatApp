@@ -136,27 +136,3 @@ let done= true;
 messageSendBtn.addEventListener("click", messageSend);
 document.addEventListener("DOMContentLoaded", getMessagesFromDatabaseAndStore
 );
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

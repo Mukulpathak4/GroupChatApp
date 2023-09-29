@@ -71,4 +71,3 @@ function signup(){
 }
 
 signupButton.addEventListener("click", signup);
-

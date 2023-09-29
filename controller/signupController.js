@@ -26,7 +26,7 @@ const postUserSignUp = async (req, res, next) => {
 
     const existingUser = await User.findOne({
       where: {
-        [Op.or]: [{ email }, { number }],
+        [Op.or]: [{ email }, { phoneNumber }],
       },
     });
 
@@ -41,7 +41,7 @@ const postUserSignUp = async (req, res, next) => {
         await User.create({
           name: name,
           email: email,
-          number: phoneNumber,
+          phoneNumber: phoneNumber,
           password: hash,
         });
       });
