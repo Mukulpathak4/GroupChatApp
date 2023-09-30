@@ -1,96 +1,103 @@
-/* Reset some default styles */
-body, h1, h2, h3, p, ul, li {
+body {
+    background-color: #202020; /* Dark background color */
+    color: #ffffff; /* Text color */
+    font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
 }
 
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f0f0f0;
-    margin: 0; /* Remove default body margin */
+h1 {
+    font-size: 24px;
+    color: #25d366; /* WhatsApp green color */
 }
 
-header {
-    background-color: #333;
-    color: #fff;
-    text-align: center;
-    padding: 10px;
+#chatapp {
+    color: #25d366; /* WhatsApp green color */
 }
 
-.container {
-    display: flex;
-    flex-direction: column; /* Change flex direction to column */
-    justify-content: space-between;
-    max-width: 1000px;
-    margin: 0 auto; /* Center the container horizontally */
-    background-color: #fff;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-    height: 100vh; /* Set container height to viewport height */
-}
-
-.sidebar {
-    width: 20%;
-    padding: 20px;
-    background-color: #444;
-    color: #fff;
-}
-
-.sidebar button {
-    display: block;
-    width: 100%;
+/* Styling for the "Create Group" section */
+#groupName {
+    background-color: #404040; /* Dark input field background */
+    color: #ffffff; /* Text color */
+    border: none;
     padding: 10px;
     margin-bottom: 10px;
-    background-color: #333;
-    color: #fff;
+}
+
+button {
+    background-color: #25d366; /* WhatsApp green color */
+    color: #ffffff; /* Text color */
     border: none;
+    padding: 10px 20px;
     cursor: pointer;
+    transition: background-color 0.3s ease;
 }
 
-.sidebar button:hover {
-    background-color: #555;
+button:hover {
+    background-color: #128C7E; /* Darker green on hover */
 }
 
-.chat {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-}
-
-.group-list {
+/* Styling for the chat area */
+#chats {
+    background-color: #303030; /* Dark chat background */
     padding: 20px;
-    background-color: #eee;
-    border-right: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 20px;
 }
 
-.message-area {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    padding: 20px;
-}
-
-.message-box {
-    flex: 1;
-    overflow-y: auto;
-    padding: 10px;
-    background-color: #f0f0f0;
-}
-
-textarea {
-    padding: 10px;
-    resize: none;
-    border: 1px solid #ccc;
-}
-
-#messageSendBtn {
-    margin-top: 10px;
-    padding: 10px;
-    background-color: #333;
-    color: #fff;
+#msg {
+    background-color: #404040; /* Dark input field background */
+    color: #ffffff; /* Text color */
     border: none;
-    cursor: pointer;
+    padding: 10px;
+    border-radius: 5px;
 }
 
-#messageSendBtn:hover {
-    background-color: #555;
+#sendMsg {
+    background-color: #25d366; /* WhatsApp green color */
+    color: #ffffff; /* Text color */
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+#sendMsg:hover {
+    background-color: #128C7E; /* Darker green on hover */
+}
+
+/* Styling for the popup */
+.popup {
+    background-color: #303030; /* Dark background for popup */
+    position: absolute;
+    padding: 10px;
+    border-radius: 5px;
+    display: none;
+    z-index: 1;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+li {
+    margin-bottom: 5px;
+}
+
+/* Add more styles as needed */
+
+/* Example styles for the "View Members" button */
+#addmemberDiv button {
+    background-color: #25d366; /* WhatsApp green color */
+    color: #ffffff; /* Text color */
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#addmemberDiv button:hover {
+    background-color: #128C7E; /* Darker green on hover */
 }

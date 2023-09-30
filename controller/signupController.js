@@ -3,13 +3,11 @@ const User = require("../models/userModel");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { Op } = require("sequelize");
+const sequelize = require("../util/config");
+const { Sequelize } = require("sequelize");
+const userServices = require("../TokenGen/jwt")
 
 
-
-function generateAccessToken(id, email) {
-  // Create a JWT token with user information and the correct secret key.
-  return jwt.sign({ userId: id, email: email }, process.env.TOKEN_SECRET);
-}
 
 const getSignUpPage = (req, res, next) => {
   // Send the login page HTML file to the client.
@@ -57,46 +55,42 @@ const postUserSignUp = async (req, res, next) => {
   }
 };
 
-const postUserLogin = (req, res, next) => {
+const postUserLogin = async (req, res, next) => {
   // Extract login email and password from the request body.
   const email = req.body.loginEmail;
   const password = req.body.loginPassword;
 
-  // Check if a user with the provided email exists in the database.
-  User.findOne({ where: { email: email } }).then((user) => {
-    if (user) {
-      // If a user with the provided email exists, compare the hashed password.
-      bcrypt.compare(password, user.password, (err, result) => {
-        if (err) {
-          // Handle unexpected errors with a 500 status response.
-          return res
-            .status(500)
-            .json({ success: false, message: "Something went wrong!" });
+     try {
+        if (!email || !password) {
+            return res.status(400).json({ message: "Bad parameters" });
         }
-        if (result == true) {
-          // If the password matches, send a success (status 200) response with an access token.
-          return res.status(200).json({
-            success: true,
-            message: "Login successful!",
-            token: generateAccessToken(user.id, user.email),
-          });
-        } else {
-          // If the password is incorrect, send a unauthorized (status 401) response.
-          return res.status(401).json({
-            success: false,
-            message: "Password incorrect!",
-          });
+        const emailorphoneSaved = await User.findOne({ where: Sequelize.or({ email: email }, { phone: email }) })
+        if (!emailorphoneSaved) {
+            return res.status(404).json({ message: "User Not Found. SignUp?" });
         }
-      });
-    } else {
-      // If no user with the provided email exists, send a not found (status 404) response.
-      return res.status(404).json({
-        success: false,
-        message: "User doesn't exist!",
-      });
+        console.log(emailorphoneSaved.password);
+        bcrypt.compare(password, emailorphoneSaved.password, (error, response) => {
+            if (error) {
+                return res.status(500).json({ message: "Something Went Wrong" });
+            }
+            if (response) {
+                return res.status(200).json({ message: "Authorised User", token: userServices.generateWebToken(emailorphoneSaved.id, emailorphoneSaved.name) });
+            }
+            else if (!response) {
+                return res.status(401).json({ message: "Unauthorised User" });
+            }
+        })
+        // console.log(emailorphoneSaved);
+
     }
-  });
-};
+    catch (err) {
+        console.log(err);
+        res.status(500).json({ message: err });
+    }
+
+}
+
+
 
 module.exports = {
   getSignUpPage,

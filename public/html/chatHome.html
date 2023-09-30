@@ -4,59 +4,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GossipGrid</title>
+    <title>Login</title>
     <link rel="stylesheet" href="../css/chatHome.css">
+    <!-- Add your CSS styles here for better visual presentation -->
 </head>
 
 <body>
-    <header>
-        <h1>GossipGrid</h1>
-        <button id="logoutBtn">Logout</button>
-    </header>
-    <div class="container">
-        <div class="sidebar">
-            <input id="groupName" placeholder="Enter Group Name" required>
-            <button id="createGroupBtn" onclick="createGroup()">Create Group</button>
-            <button id="deleteGroupBtn">Delete Group</button>
-            <button id="addToGroupBtn">Add to Group</button>
-        </div>
-
-
+    <div>
+        <h1><span id="chatapp">GossipGrid</span></h1>
         <div id="addmemberDiv" hidden>
-            <button onclick="publicGroup()" id="publicgroup">Public
-                Group</button>
+            <button onclick="publicGroup()" id="publicgroup">Group Chat</button>
             <div>
-
                 <button onclick="showpopup()">View Members</button>
-                <div id="popup">
-                    <ul id="viewmembers">
-
-                    </ul>
-
-                    <button onclick="hidepopup()">close</button>
+                <div class="popup" id="popup">
+                    <ul id="viewmembers"></ul>
+                    <button onclick="hidepopup()">Close</button>
                 </div>
                 <div id="addmemberDiv">
                     <input id="addmember" type="text" placeholder="Enter Email/phone">
                     <br>
                     <button onclick="addmember()">Add Member</button>
                 </div>
-
             </div>
         </div>
-        <div id="action-container"></div>
-        <div class="chat">
-            <div id="groups" class="group-list">
-                <!-- Group list will be populated here dynamically -->
-            </div>
-            <div class="message-area">
-                <div id="chats" class="message-box">
-                    <!-- Messages will be displayed here -->
-                </div>
-                <textarea id="messageInput" placeholder="Type your message..."></textarea>
-                <button id="messageSendBtn" onclick="sendMsg()">Send</button>
-            </div>
+        <br>
+        <div id="chats"></div>
+        <div>
+            <input type="text" id="msg" placeholder="Enter message" required>
+            <button id="sendMsg" onclick="sendMsg()">Send</button>
         </div>
     </div>
+
+    <div>
+        <h1><span>Groups</span></h1>
+        <input type="text" id="groupName" placeholder="Enter Group Name" required>
+        <button onclick="createGroup()">Create Group</button>
+        <br>
+        <div>
+            <ul id="groups"></ul>
+        </div>
+    </div>
+
+    <!-- JavaScript libraries -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+    <!-- Your custom JavaScript file -->
     <script src="../js/chat.js"></script>
 </body>
 

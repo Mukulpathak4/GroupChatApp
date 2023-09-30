@@ -1,36 +1,18 @@
+require("dotenv").config();
 const express = require("express");
 const app = express();
-
 const bodyParser = require("body-parser");
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
-
-
-const signupRoutes = require("./routes/signupRoutes");
-const homeRoutes = require("./routes/homeRoutes");
+const cors = require("cors");
+const homeRoute = require("./routes/homeRoutes");
+const loginRoute = require("./routes/signupRoutes");
+const chatRoute = require("./routes/chatRoutes");
+const tokenRoute = require("./routes/tokenRoutes");
+const path = require("path");
 const sequelize = require("./util/config");
-
-const chatRouter = require("./routes/chatRoutes");
-
-const Chat = require("./models/chatModel")
-const User = require("./models/userModel")
-const Group = require("./models/groupModel")
-const GroupMember = require("./models/groupMemberModel")
-
-
-
-
-// const cors = require("cors");
-require('dotenv').config(); // Load environment variables from .env file
-
-const PORT = 3000;
-
-
-app.use("/", signupRoutes);
-
-app.use("/home", homeRoutes);
-
-app.use("/",chatRouter);
+const User = require("./models/userModel");
+const Chat = require("./models/chatModel");
+const Group = require("./models/groupModel");
+const GroupMember = require("./models/groupMemberModel");
 
 Chat.belongsTo(User);
 User.hasMany(Chat);
@@ -41,10 +23,36 @@ User.belongsToMany(Group, { through: GroupMember });
 Chat.belongsTo(Group);
 Group.hasMany(Chat);
 
-sequelize
-  .sync() // This method synchronizes the database schema with the defined models.
-  .then((result) => {
-    app.listen(process.env.PORT ||PORT); // Start the Express app on port 3200.
-    console.log("Server Started");
-  })
-  .catch((err) => console.log(err)); // Handle any errors that occur during synchronization.
+
+app.use(cors({
+    origin: "*"
+}));
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+app.use("/",loginRoute);
+app.use("/home",homeRoute);
+app.use("/chat",chatRoute);
+app.use("/token",tokenRoute);
+
+
+
+
+
+
+
+
+sequelize.sync()
+    // sequelize.sync({ force: true })
+    .then(async () => {
+
+        User.findAndCountAll()
+            .then(async (result) => {
+                if (result.count == 0) {
+                    await User.create({ name: "Public", email: "null", phone: "public", password: "public" })
+                    await Group.create({ groupname: "Public", creator: 1 })
+                    await GroupMember.create({ groupGroupid: 1, userId: 1 })
+                }
+                app.listen(3000);
+            })
+    })
+    .catch(err => console.log(err));

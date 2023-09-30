@@ -1,15 +1,16 @@
 const express = require("express");
 const router = express.Router();
-const chatController = require("../controller/chatController");
+const chatControl = require("../controller/chatController");
 const userAuthentication = require("../authentication/auth");
 
-router.post("/send-msg", userAuthentication, chatController.send_msg);
-router.get("/getAllChats", userAuthentication, chatController.getAllChats);
-router.get("/getUpdate/:lastMsgId", userAuthentication, chatController.getUpdate);
-router.post("/createGroup", userAuthentication, chatController.createGroup);
-router.get("/getAllGroups", userAuthentication, chatController.getAllGroups);
-router.post("/addmember", userAuthentication, chatController.addmember);
-
-
+router.post("/send-msg", userAuthentication, chatControl.send_msg);
+router.get("/getAllChats", userAuthentication, chatControl.getAllChats);
+router.get("/getUpdate/:lastMsgId", userAuthentication, chatControl.getUpdate);
+router.post("/createGroup", userAuthentication, chatControl.createGroup);
+router.get("/getAllGroups", userAuthentication, chatControl.getAllGroups);
+router.post("/addmember", userAuthentication, chatControl.addmember);
+router.get("/viewAllMembers", userAuthentication, chatControl.viewAllMembers);
+router.get("/addAdmin/:userid", userAuthentication, chatControl.addAdmin);
+router.get("/removeMember/:userid", userAuthentication, chatControl.removeMember);
 
 module.exports = router;
