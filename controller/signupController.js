@@ -74,10 +74,10 @@ const postUserLogin = async (req, res, next) => {
                 return res.status(500).json({ message: "Something Went Wrong" });
             }
             if (response) {
-                return res.status(200).json({ message: "Authorised User", token: userServices.generateWebToken(emailorphoneSaved.id, emailorphoneSaved.name) });
+                return res.status(200).json({ message: "Welcome To GossipGrid!", token: userServices.generateWebToken(emailorphoneSaved.id, emailorphoneSaved.name) });
             }
             else if (!response) {
-                return res.status(401).json({ message: "Unauthorised User" });
+                return res.status(401).json({ message: "You Are Not an Existing User" });
             }
         })
         // console.log(emailorphoneSaved);

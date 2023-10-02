@@ -11,13 +11,17 @@
 
 <body>
     <div>
-        <h1><span id="chatapp">GossipGrid</span></h1>
-        <div id="addmemberDiv" hidden>
+        <div class="navbar">
+            <h1 class="Title"><span id="chatapp">GossipGrid</span></h1>
+            <button onclick="profile()">Profile</button>
+            <button onclick="logout()">Logout</button>
+        </div>
+        <div class="navbar" id="addmemberDiv" hidden>
             <button onclick="publicGroup()" id="publicgroup">Group Chat</button>
             <div>
                 <button onclick="showpopup()">View Members</button>
-                <div class="popup" id="popup">
-                    <ul id="viewmembers"></ul>
+                <div class="popupWindow" id="popup">
+                    <ul class="members" id="viewmembers"></ul>
                     <button onclick="hidepopup()">Close</button>
                 </div>
                 <div id="addmemberDiv">
@@ -28,19 +32,22 @@
             </div>
         </div>
         <br>
-        <div id="chats"></div>
-        <div>
+        <div class="chatsContainer" id="chats"></div>
+        <div class="msgContainer">
             <input type="text" id="msg" placeholder="Enter message" required>
             <button id="sendMsg" onclick="sendMsg()">Send</button>
         </div>
     </div>
 
     <div>
-        <h1><span>Groups</span></h1>
-        <input type="text" id="groupName" placeholder="Enter Group Name" required>
-        <button onclick="createGroup()">Create Group</button>
+        <div class="navbar">
+            <input type="text" id="groupName" placeholder="Enter Group Name" required>
+            <button onclick="createGroup()">Create Group</button>
+            <button onclick="DeleteGroup()">Delete Group</button>
+        </div>
         <br>
-        <div>
+        <div class="groupsContainer">
+            <h1><span>Groups</span></h1>
             <ul id="groups"></ul>
         </div>
     </div>

@@ -29,6 +29,10 @@ const authenticate = async (req, res, next) => {
         next();
     } catch (err) {
         console.error(err);
+        if (err.name === "JsonWebTokenError") {
+            // Handle JWT error - Unauthorized
+            return res.status(401).json({ message: "Unauthorized: Invalid token" });
+        }
         res.status(500).json({ message: "Internal server error" });
     }
 };

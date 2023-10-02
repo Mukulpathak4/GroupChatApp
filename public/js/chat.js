@@ -2,21 +2,19 @@ window.addEventListener("DOMContentLoaded", loadChat);
 
 
 async function loadChat() {
+    try {
+        await DOMloadChat(1);
+        await DOMloadGroups();
+    } catch (err) {
+        console.log(err);
 
-    const p1 = new Promise((resolve, reject) => {
-        resolve(DOMloadChat(1));
-    })
-
-    const p2 = new Promise((resolve, reject) => {
-        resolve(DOMloadGroups())
-    })
-
-    Promise.all([p1, p2])
-        .then()
-        .catch(err => {
-            console.log(err);
-        })
+        if (err.response && err.response.status === 401) {
+            // Unauthorized error, handle as needed (e.g., redirect to login)
+            window.location.href = "/"; // Redirect to login page
+        }
+    }
 }
+
 
 async function DOMloadChat(grpid) {
     const token = localStorage.getItem("token");
@@ -115,14 +113,15 @@ async function DOMloadGroups() {
 
     if (getGroups.data.allGroups.length > 0) {
         getGroups.data.allGroups.forEach((item) => {
-            appendGroupToPage(item.groupname, item.groupid);
-        })
+            const isAdmin = item.isAdmin; // Replace 'isAdmin' with the actual property name from your backend
+            appendGroupToPage(item.groupname, item.groupid, isAdmin);
+        });
         document.getElementById("groups").addEventListener("click", onGroupClick);
-    }
-    else {
+    } else {
         document.getElementById("groups").innerHTML = "<p>No groups found</p>";
     }
 }
+
 
 async function onGroupClick(e) {
 
@@ -150,21 +149,30 @@ async function onGroupClick(e) {
     }
 }
 
-function appendGroupToPage(groupname, groupid) {
+function appendGroupToPage(groupname, groupid, isAdmin) {
     const li = document.createElement("li");
     li.appendChild(document.createTextNode(groupname));
     li.name = groupname;
     li.id = groupid;
-    li.className = "float-left"
+    li.className = "float-left";
 
     const btnOpen = document.createElement("button");
     btnOpen.className = "btn btn-sm btn-info float-right open";
     btnOpen.appendChild(document.createTextNode("OpenChat"));
 
     li.appendChild(btnOpen);
+
+    if (isAdmin) {
+        // If the user is an admin, show the "Delete Group" button
+        const deleteButton = document.createElement("button");
+        deleteButton.appendChild(document.createTextNode("Delete Group"));
+        deleteButton.onclick = () => deleteGroup(groupid); // Call deleteGroup with the group ID
+        deleteButton.className = "btn btn-sm btn-danger delete";
+        li.appendChild(deleteButton);
+    }
+
     document.getElementById("groups").appendChild(li);
 }
-
 
 
 function appendChatToPage(message, name) {
@@ -189,7 +197,7 @@ async function sendMsg() {
         }, { headers: { "Authorization": token } })
 
         document.getElementById("msg").value = "";
-
+        window.location.href = "/home";
     }
 
     catch (err) {
@@ -198,34 +206,26 @@ async function sendMsg() {
 
 }
 
-// setInterval(() => {
-//     getUpdatedChats();
-//     DOMloadGroups()
-
-// }, 1000)
-
-
-
 async function createGroup() {
-
     try {
         const groupName = document.getElementById("groupName").value;
         const token = localStorage.getItem("token");
         if (!groupName) {
             throw new Error("Enter Group Name");
-            return
+        } else {
+            const result = await axios.post("http://localhost:3000/chat/createGroup", { groupName: groupName }, { headers: { "Authorization": token } });
+
+            console.log(result);
+            const { groupid, groupname } = result.data.result;
+
+            // Append the new group to the page
+            appendGroupToPage(groupname, groupid);
         }
-        const result = await axios.post("http://localhost:3000/chat/createGroup", { groupName: groupName }, { headers: { "Authorization": token } });
-
-        console.log(result)
-        const { groupid, groupname } = result.data.result;
-
-        appendGroupToPage(groupname, groupid);
-    }
-    catch (err) {
+    } catch (err) {
         console.log(err);
     }
 }
+
 
 async function addmember() {
     const member = document.getElementById("addmember").value;
@@ -291,20 +291,21 @@ async function showpopup() {
 }
 
 function appendMembersToPopup(member, adminSet, myId) {
-
     const li = document.createElement("li");
     li.id = member.id;
-    li.appendChild(document.createTextNode(`${member.name} :`))
-    // li.className = "float-left"
 
+    const memberName = document.createElement("span");
+    memberName.style.color = "black"; // Set the text color to black
+    memberName.appendChild(document.createTextNode(`${member.name} :`));
+
+    li.appendChild(memberName);
 
     const btnAdmin = document.createElement("button");
     btnAdmin.className = "btn btn-sm btn-link admin";
     btnAdmin.disabled = true;
     if (adminSet.has(member.id)) {
         btnAdmin.appendChild(document.createTextNode("Admin"));
-    }
-    else {
+    } else {
         btnAdmin.appendChild(document.createTextNode("Make Admin"));
         if (adminSet.has(myId)) {
             btnAdmin.disabled = false;
@@ -312,7 +313,7 @@ function appendMembersToPopup(member, adminSet, myId) {
     }
 
     const btnRemove = document.createElement("button");
-    btnRemove.className = "btn btn-sm btn-link  remove";
+    btnRemove.className = "btn btn-sm btn-link remove";
     btnRemove.disabled = true;
     btnRemove.appendChild(document.createTextNode("Remove Member"));
 
@@ -324,6 +325,7 @@ function appendMembersToPopup(member, adminSet, myId) {
     li.appendChild(btnRemove);
     document.getElementById("viewmembers").appendChild(li);
 }
+
 
 document.getElementById("viewmembers").addEventListener("click", memberClick);
 
@@ -358,4 +360,31 @@ async function memberClick(e) {
 
 function hidepopup() {
     document.getElementById("popup").style.display = 'none';
+}
+
+function logout() {
+    // Clear the token from localStorage
+    localStorage.removeItem("token");
+
+    // Redirect the user to the login page or perform any other desired logout actions
+    window.location.href = "/"; // Replace "/login" with the actual logout URL
+}
+async function deleteGroup(groupid) {
+    const token = localStorage.getItem("token");
+
+    try {
+        // Send a DELETE request to the backend to delete the group
+        await axios.delete(`http://localhost:3000/chat/deleteGroup/${groupid}`, {
+            headers: { "Authorization": token }
+        });
+
+        // Remove the group from the page after successful deletion
+        const groupElement = document.getElementById(groupid);
+        if (groupElement) {
+            groupElement.remove();
+        }
+    } catch (err) {
+        console.log(err);
+        // Handle any errors, such as displaying an error message to the user
+    }
 }

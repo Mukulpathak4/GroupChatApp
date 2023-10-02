@@ -1,103 +1,145 @@
+/* Reset default styles and set a background color */
 body {
-    background-color: #202020; /* Dark background color */
-    color: #ffffff; /* Text color */
-    font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f6f8fa;
 }
 
-h1 {
-    font-size: 24px;
-    color: #25d366; /* WhatsApp green color */
-}
-
-#chatapp {
-    color: #25d366; /* WhatsApp green color */
-}
-
-/* Styling for the "Create Group" section */
-#groupName {
-    background-color: #404040; /* Dark input field background */
-    color: #ffffff; /* Text color */
-    border: none;
+/* Style the navigation bar */
+.navbar {
+    background-color: #24292e;
+    color: #ffffff;
     padding: 10px;
-    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
-button {
-    background-color: #25d366; /* WhatsApp green color */
-    color: #ffffff; /* Text color */
+/* Style the title */
+.Title {
+    font-size: 24px;
+    margin: 0;
+}
+
+/* Style buttons in the navigation bar */
+.navbar button {
+    background-color: #24292e;
+    color: #ffffff;
     border: none;
     padding: 10px 20px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    margin-left: 10px;
+    font-size: 16px;
 }
 
-button:hover {
-    background-color: #128C7E; /* Darker green on hover */
-}
-
-/* Styling for the chat area */
-#chats {
-    background-color: #303030; /* Dark chat background */
+/* Style the chat container */
+.chatsContainer {
+    background-color: #ffffff;
     padding: 20px;
-    border-radius: 5px;
-    margin-bottom: 20px;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin: 20px;
+}
+
+/* Style the message input and send button */
+.msgContainer {
+    display: flex;
+    align-items: center;
+    background-color: #ffffff;
+    padding: 10px;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin: 20px;
 }
 
 #msg {
-    background-color: #404040; /* Dark input field background */
-    color: #ffffff; /* Text color */
+    flex: 1;
     border: none;
     padding: 10px;
-    border-radius: 5px;
+    border-radius: 4px;
 }
 
 #sendMsg {
-    background-color: #25d366; /* WhatsApp green color */
-    color: #ffffff; /* Text color */
+    background-color: #0366d6;
+    color: #ffffff;
     border: none;
     padding: 10px 20px;
+    border-radius: 4px;
     cursor: pointer;
-    border-radius: 5px;
-    transition: background-color 0.3s ease;
+    margin-left: 10px;
 }
 
-#sendMsg:hover {
-    background-color: #128C7E; /* Darker green on hover */
+/* Style the group container */
+.groupsContainer {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin: 20px;
 }
 
-/* Styling for the popup */
-.popup {
-    background-color: #303030; /* Dark background for popup */
-    position: absolute;
+/* Style the group name input and buttons */
+#groupName {
+    width: 100%;
+    border: none;
     padding: 10px;
-    border-radius: 5px;
-    display: none;
-    z-index: 1;
+    border-radius: 4px;
+    margin-bottom: 10px;
 }
 
-ul {
+.groupsContainer h1 {
+    font-size: 20px;
+    margin: 0;
+    color: #333;
+}
+
+/* Style the list of groups */
+#groups {
     list-style-type: none;
     padding: 0;
 }
 
-li {
-    margin-bottom: 5px;
+#groups li {
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #f6f8fa;
 }
 
-/* Add more styles as needed */
+/* Add hover effect to list items */
+#groups li:hover {
+    background-color: #e1e4e8;
+}
 
-/* Example styles for the "View Members" button */
-#addmemberDiv button {
-    background-color: #25d366; /* WhatsApp green color */
-    color: #ffffff; /* Text color */
+/* Style the popup window */
+.popupWindow {
+    display: none;
+    position: absolute;
+    background-color: #ffffff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+    padding: 10px;
+    z-index: 1;
+}
+
+/* Style the members list */
+.members {
+    list-style-type: none;
+    padding: 0;
+}
+
+/* Style the close button in the popup */
+.popupWindow button {
+    background-color: #0366d6;
+    color: #ffffff;
     border: none;
-    padding: 10px 20px;
+    padding: 5px 10px;
+    border-radius: 4px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-#addmemberDiv button:hover {
-    background-color: #128C7E; /* Darker green on hover */
+    margin-top: 10px;
 }

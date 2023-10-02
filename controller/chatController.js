@@ -41,6 +41,7 @@ exports.getAllChats = async (req, res, next) => {
     }
     catch (err) {
         console.log(err);
+        
         res.status(500).json({ message: err });
     }
 }
@@ -93,11 +94,36 @@ exports.createGroup = async (req, res, next) => {
 }
 
 exports.getAllGroups = async (req, res, next) => {
+    const userId = req.user.id; // Get the ID of the logged-in user.
 
-    const allGroups = await req.user.getGroups();
+    try {
+        // Fetch all groups associated with the user.
+        const allGroups = await Group.findAll({
+            where: { creator: userId }, // You can adjust this condition based on your logic.
+        });
 
-    res.status(200).json({ message: "success", allGroups: allGroups });
-}
+        // Fetch the IDs of groups where the user is an admin.
+        const adminGroupIds = await Admin.findAll({
+            where: { userId: userId },
+            attributes: ["groupId"],
+        });
+
+        // Create a Set of admin group IDs for faster lookups.
+        const adminGroupIdsSet = new Set(adminGroupIds.map((admin) => admin.groupId));
+
+        // Map the groups to include the 'isAdmin' property.
+        const groupsWithAdminStatus = allGroups.map((group) => ({
+            ...group.toJSON(),
+            isAdmin: adminGroupIdsSet.has(group.id),
+        }));
+
+        res.status(200).json({ message: "success", allGroups: groupsWithAdminStatus });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: err });
+    }
+};
+
 
 exports.getGroupToken = async (req, res, next) => {
     try {
@@ -146,7 +172,7 @@ exports.addmember = async (req, res, next) => {
     }
 }
 
-exports.viewAllMembers = (async (req, res, next) => {
+exports.viewAllMembers = async (req, res, next) => {
     const groupid = req.user.dataValues.groupId;
 
     const p1 = new Promise((resolve, reject) => {
@@ -170,7 +196,7 @@ exports.viewAllMembers = (async (req, res, next) => {
 
     res.status(200).json({ messgae: "Success", members: result, myId: req.user.id })
 
-})
+}
 
 exports.addAdmin = async (req, res, next) => {
     const userid = req.params.userid;
@@ -222,3 +248,58 @@ exports.removeMember = async (req, res, next) => {
         res.status(500).json({ message: err });
     }
 }
+
+exports.deleteGroup = async (req, res, next) => {
+    const groupIdToDelete = req.params.groupId; // Extract the group ID from the request parameters.
+
+    try {
+        // Fetch the group to be deleted.
+        const group = await Group.findByPk(groupIdToDelete);
+
+        if (!group) {
+            return res.status(404).json({ message: "Group not found" });
+        }
+
+        // Check if the user has the necessary permissions to delete the group.
+        const isAdmin = await Admin.findOne({
+            where: { groupId: groupIdToDelete, userId: req.user.id },
+        });
+
+        if (!isAdmin) {
+            return res.status(401).json({ message: "Unauthorized to delete the group" });
+        }
+
+        // Use a transaction to ensure data consistency during deletion.
+        const t = await sequelize.transaction();
+
+        try {
+            // Delete group members.
+            await GroupMember.destroy({
+                where: { groupGroupid: groupIdToDelete },
+                transaction: t,
+            });
+
+            // Delete group-related chat messages.
+            await Chat.destroy({
+                where: { groupGroupid: groupIdToDelete },
+                transaction: t,
+            });
+
+            // Delete the group itself.
+            await group.destroy({ transaction: t });
+
+            // Commit the transaction.
+            await t.commit();
+
+            res.status(200).json({ message: "Group deleted successfully" });
+        } catch (error) {
+            // Rollback the transaction in case of an error.
+            await t.rollback();
+            console.error("Error deleting group:", error);
+            res.status(500).json({ message: "Error deleting group" });
+        }
+    } catch (error) {
+        console.error("Error fetching group:", error);
+        res.status(500).json({ message: "Error fetching group" });
+    }
+};

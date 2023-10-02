@@ -12,5 +12,6 @@ router.post("/addmember", userAuthentication, chatControl.addmember);
 router.get("/viewAllMembers", userAuthentication, chatControl.viewAllMembers);
 router.get("/addAdmin/:userid", userAuthentication, chatControl.addAdmin);
 router.get("/removeMember/:userid", userAuthentication, chatControl.removeMember);
+router.post("/deleteGroup/:groupid", userAuthentication,chatControl.deleteGroup);
 
 module.exports = router;

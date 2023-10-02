@@ -41,6 +41,7 @@ app.use("/token",tokenRoute);
 
 
 
+
 sequelize.sync()
     // sequelize.sync({ force: true })
     .then(async () => {
