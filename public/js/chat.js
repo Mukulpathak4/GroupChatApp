@@ -25,7 +25,7 @@ async function DOMloadChat(grpid) {
 
     // }
     if (localChats == undefined) {
-        const getAllChats = await axios.get("http://localhost:3000/chat/getAllChats",
+        const getAllChats = await axios.get("http://52.66.181.47/chat/getAllChats",
             { headers: { "Authorization": token } });
         const arrLen = getAllChats.data.allChat.length;
 
@@ -65,14 +65,14 @@ async function getUpdatedChats(grpid) {
     let token = localStorage.getItem("token")
 
     if (grpid == 1) {
-        const result = await axios.get(`http://localhost:3000/token/getGroupToken/${grpid}`,
+        const result = await axios.get(`http://52.66.181.47/token/getGroupToken/${grpid}`,
             { headers: { "Authorization": token } });
         token = result.data.token;
     }
 
     localStorage.setItem("token", token);
 
-    const updatedMsg = await axios.get(`http://localhost:3000/chat/getUpdate/${lastMsgId}`,
+    const updatedMsg = await axios.get(`http://52.66.181.47/chat/getUpdate/${lastMsgId}`,
         { headers: { "Authorization": token } });
 
     if (updatedMsg.data.updatedChat.length > 0) {
@@ -106,7 +106,7 @@ async function getUpdatedChats(grpid) {
 
 async function DOMloadGroups() {
     const token = localStorage.getItem("token");
-    const getGroups = await axios.get("http://localhost:3000/chat/getAllGroups",
+    const getGroups = await axios.get("http://52.66.181.47/chat/getAllGroups",
         { headers: { "Authorization": token } });
 
     document.getElementById("groups").innerHTML = "";
@@ -135,7 +135,7 @@ async function onGroupClick(e) {
             const groupId = e.target.parentNode.id;
             const token = localStorage.getItem("token")
 
-            const result = await axios.get(`http://localhost:3000/token/getGroupToken/${groupId}`,
+            const result = await axios.get(`http://52.66.181.47/token/getGroupToken/${groupId}`,
                 { headers: { "Authorization": token } });
             localStorage.setItem("token", result.data.token);
 
@@ -192,7 +192,7 @@ async function sendMsg() {
     }
     try {
 
-        await axios.post("http://localhost:3000/chat/send-msg", {
+        await axios.post("http://52.66.181.47/chat/send-msg", {
             msg: msg
         }, { headers: { "Authorization": token } })
 
@@ -213,7 +213,7 @@ async function createGroup() {
         if (!groupName) {
             throw new Error("Enter Group Name");
         } else {
-            const result = await axios.post("http://localhost:3000/chat/createGroup", { groupName: groupName }, { headers: { "Authorization": token } });
+            const result = await axios.post("http://52.66.181.47/chat/createGroup", { groupName: groupName }, { headers: { "Authorization": token } });
 
             console.log(result);
             const { groupid, groupname } = result.data.result;
@@ -233,7 +233,7 @@ async function addmember() {
     if (member) {
         console.log(member);
         try {
-            const result = await axios.post("http://localhost:3000/chat/addmember", {
+            const result = await axios.post("http://52.66.181.47/chat/addmember", {
                 member: member
             }, { headers: { "Authorization": token } });
 
@@ -253,7 +253,7 @@ async function addmember() {
 async function publicGroup() {
     try {
         const token = localStorage.getItem("token");
-        const result = await axios.get("http://localhost:3000/token/getPublicToken",
+        const result = await axios.get("http://52.66.181.47/token/getPublicToken",
             { headers: { "Authorization": token } });
         localStorage.setItem("token", result.data.token);
         window.location.href = "/home"
@@ -267,7 +267,7 @@ async function showpopup() {
     document.getElementById("viewmembers").innerHTML = "";
     try {
         const token = localStorage.getItem("token");
-        const allMembers = await axios.get("http://localhost:3000/chat/viewAllMembers",
+        const allMembers = await axios.get("http://52.66.181.47/chat/viewAllMembers",
             { headers: { "Authorization": token } });
 
         const admins = allMembers.data.members[1];
@@ -335,7 +335,7 @@ async function memberClick(e) {
 
     if (e.target.classList.contains("admin")) {
         try {
-            const result = await axios.get(`http://localhost:3000/chat/addAdmin/${userid}`,
+            const result = await axios.get(`http://52.66.181.47/chat/addAdmin/${userid}`,
                 { headers: { "Authorization": token } });
         }
         catch (err) {
@@ -348,7 +348,7 @@ async function memberClick(e) {
         console.log("Remove")
 
         try {
-            const result = await axios.get(`http://localhost:3000/chat/removeMember/${userid}`,
+            const result = await axios.get(`http://52.66.181.47/chat/removeMember/${userid}`,
                 { headers: { "Authorization": token } });
         }
         catch (err) {
@@ -374,7 +374,7 @@ async function deleteGroup(groupid) {
 
     try {
         // Send a DELETE request to the backend to delete the group
-        await axios.delete(`http://localhost:3000/chat/deleteGroup/${groupid}`, {
+        await axios.delete(`http://52.66.181.47/chat/deleteGroup/${groupid}`, {
             headers: { "Authorization": token }
         });
 
