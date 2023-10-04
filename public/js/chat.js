@@ -1,20 +1,48 @@
-window.addEventListener("DOMContentLoaded", loadChat);
+  // Connect to the Socket.IO server
+  const socket = io();
 
+  window.addEventListener("DOMContentLoaded", loadChat);
 
-async function loadChat() {
+  async function loadChat() {
     try {
-        await DOMloadChat(1);
-        await DOMloadGroups();
+      await DOMloadChat(1);
+      await DOMloadGroups();
     } catch (err) {
-        console.log(err);
+      console.log(err);
 
-        if (err.response && err.response.status === 401) {
-            // Unauthorized error, handle as needed (e.g., redirect to login)
-            window.location.href = "/"; // Redirect to login page
-        }
+      if (err.response && err.response.status === 401) {
+        // Unauthorized error, handle as needed (e.g., redirect to login)
+        window.location.href = "/"; // Redirect to login page
+      }
     }
-}
+  }
 
+  // ... rest of your code ...
+
+  async function sendMsg() {
+    const msg = document.getElementById("msg").value;
+    const token = localStorage.getItem("token");
+
+    if (!msg) {
+      return;
+    }
+
+    try {
+      // Emit a "chat message" event to the server with the message
+      socket.emit("chat message", msg);
+
+      // Clear the input field
+      document.getElementById("msg").value = "";
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  // Add this event listener to receive real-time messages from the server
+  socket.on("chat message", (message) => {
+    // Handle the incoming message and append it to the chat window
+    appendChatToPage(message, "User"); // Replace "User" with the sender's name
+  });
 
 async function DOMloadChat(grpid) {
     const token = localStorage.getItem("token");
@@ -25,7 +53,7 @@ async function DOMloadChat(grpid) {
 
     // }
     if (localChats == undefined) {
-        const getAllChats = await axios.get("http://13.200.99.59:3000/chat/getAllChats",
+        const getAllChats = await axios.get("http://13.200.99.59    :3000/chat/getAllChats",
             { headers: { "Authorization": token } });
         const arrLen = getAllChats.data.allChat.length;
 
@@ -65,14 +93,14 @@ async function getUpdatedChats(grpid) {
     let token = localStorage.getItem("token")
 
     if (grpid == 1) {
-        const result = await axios.get(`http://13.200.99.59:3000/token/getGroupToken/${grpid}`,
+        const result = await axios.get(`http://13.200.99.59    :3000/token/getGroupToken/${grpid}`,
             { headers: { "Authorization": token } });
         token = result.data.token;
     }
 
     localStorage.setItem("token", token);
 
-    const updatedMsg = await axios.get(`http://13.200.99.59:3000/chat/getUpdate/${lastMsgId}`,
+    const updatedMsg = await axios.get(`http://13.200.99.59    :3000/chat/getUpdate/${lastMsgId}`,
         { headers: { "Authorization": token } });
 
     if (updatedMsg.data.updatedChat.length > 0) {
@@ -106,7 +134,7 @@ async function getUpdatedChats(grpid) {
 
 async function DOMloadGroups() {
     const token = localStorage.getItem("token");
-    const getGroups = await axios.get("http://13.200.99.59:3000/chat/getAllGroups",
+    const getGroups = await axios.get("http://13.200.99.59    :3000/chat/getAllGroups",
         { headers: { "Authorization": token } });
 
     document.getElementById("groups").innerHTML = "";
@@ -135,7 +163,7 @@ async function onGroupClick(e) {
             const groupId = e.target.parentNode.id;
             const token = localStorage.getItem("token")
 
-            const result = await axios.get(`http://13.200.99.59:3000/token/getGroupToken/${groupId}`,
+            const result = await axios.get(`http://13.200.99.59    :3000/token/getGroupToken/${groupId}`,
                 { headers: { "Authorization": token } });
             localStorage.setItem("token", result.data.token);
 
@@ -182,30 +210,6 @@ function appendChatToPage(message, name) {
     document.getElementById("chats").appendChild(p);
 }
 
-async function sendMsg() {
-
-    const msg = document.getElementById("msg").value;
-    const token = localStorage.getItem("token")
-
-    if (!msg) {
-        return
-    }
-    try {
-
-        await axios.post("http://13.200.99.59:3000/chat/send-msg", {
-            msg: msg
-        }, { headers: { "Authorization": token } })
-
-        document.getElementById("msg").value = "";
-        window.location.href = "/home";
-    }
-
-    catch (err) {
-        console.log(err);
-    }
-
-}
-
 async function createGroup() {
     try {
         const groupName = document.getElementById("groupName").value;
@@ -213,7 +217,7 @@ async function createGroup() {
         if (!groupName) {
             throw new Error("Enter Group Name");
         } else {
-            const result = await axios.post("http://13.200.99.59:3000/chat/createGroup", { groupName: groupName }, { headers: { "Authorization": token } });
+            const result = await axios.post("http://13.200.99.59    :3000/chat/createGroup", { groupName: groupName }, { headers: { "Authorization": token } });
 
             console.log(result);
             const { groupid, groupname } = result.data.result;
@@ -233,7 +237,7 @@ async function addmember() {
     if (member) {
         console.log(member);
         try {
-            const result = await axios.post("http://13.200.99.59:3000/chat/addmember", {
+            const result = await axios.post("http://13.200.99.59    :3000/chat/addmember", {
                 member: member
             }, { headers: { "Authorization": token } });
 
@@ -253,7 +257,7 @@ async function addmember() {
 async function publicGroup() {
     try {
         const token = localStorage.getItem("token");
-        const result = await axios.get("http://13.200.99.59:3000/token/getPublicToken",
+        const result = await axios.get("http://13.200.99.59    :3000/token/getPublicToken",
             { headers: { "Authorization": token } });
         localStorage.setItem("token", result.data.token);
         window.location.href = "/home"
@@ -267,7 +271,7 @@ async function showpopup() {
     document.getElementById("viewmembers").innerHTML = "";
     try {
         const token = localStorage.getItem("token");
-        const allMembers = await axios.get("http://13.200.99.59:3000/chat/viewAllMembers",
+        const allMembers = await axios.get("http://13.200.99.59    :3000/chat/viewAllMembers",
             { headers: { "Authorization": token } });
 
         const admins = allMembers.data.members[1];
@@ -335,7 +339,7 @@ async function memberClick(e) {
 
     if (e.target.classList.contains("admin")) {
         try {
-            const result = await axios.get(`http://13.200.99.59:3000/chat/addAdmin/${userid}`,
+            const result = await axios.get(`http://13.200.99.59    :3000/chat/addAdmin/${userid}`,
                 { headers: { "Authorization": token } });
         }
         catch (err) {
@@ -348,7 +352,7 @@ async function memberClick(e) {
         console.log("Remove")
 
         try {
-            const result = await axios.get(`http://13.200.99.59:3000/chat/removeMember/${userid}`,
+            const result = await axios.get(`http://13.200.99.59    :3000/chat/removeMember/${userid}`,
                 { headers: { "Authorization": token } });
         }
         catch (err) {
@@ -374,7 +378,7 @@ async function deleteGroup(groupid) {
 
     try {
         // Send a DELETE request to the backend to delete the group
-        await axios.delete(`http://13.200.99.59:3000/chat/deleteGroup/${groupid}`, {
+        await axios.delete(`http://13.200.99.59    :3000/chat/deleteGroup/${groupid}`, {
             headers: { "Authorization": token }
         });
 
