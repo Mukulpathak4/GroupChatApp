@@ -1,305 +1,59 @@
-const Chat = require("../models/chatModel");
-const User = require("../models/userModel");
-const Group = require("../models/groupModel");
-const GroupMember = require("../models/groupMemberModel");
-const Admin = require("../models/adminModel");
-const { Sequelize, Op } = require("sequelize");
-const userServices = require("../TokenGen/jwt");
-const sequelize = require("../util/config");
+// Import necessary modules and models
+const Chat = require('../models/chatModel');
+const ArchivedChat = require('../models/archivedChatModel');
 
-exports.send_msg = async (req, res, next) => {
-    // console.log(req.user.dataValues.groupId);
+// Post a text message to the Chats table
+const postMessage = async (req, res) => {
     try {
-        await req.user.createChat({
-            message: req.body.msg,
-            groupGroupid: req.user.dataValues.groupId
-        })
+        // Extract data from the request body
+        const { textMessage, groupId } = req.body;
 
-        res.status(200).json({ message: "Msg Sent" });
+        // Get the user's name from the request object
+        const name = req.user.name;
 
-    }
-    catch (err) {
-        console.log(err);
-        res.status(500).json({ message: err });
-    }
-
-}
-
-exports.getAllChats = async (req, res, next) => {
-    // console.log(req.user.dataValues.groupId, "findchats gid");
-    try {
-        const allChat = await Chat.findAll({
-            attributes: ["id", "message", "userId"],
-            where: { groupGroupid: req.user.dataValues.groupId },
-            include: [{
-                model: User,
-                attributes: ["name"]
-            }],
-            group: ["id"]
-        });
-        res.status(200).json({ message: "Success", allChat: allChat });
-    }
-    catch (err) {
-        console.log(err);
-        
-        res.status(500).json({ message: err });
-    }
-}
-
-exports.getUpdate = async (req, res, next) => {
-    try {
-        const lastMsgId = req.params.lastMsgId;
-        // console.log(lastMsgId, "lastmsgid");
-
-        const updatedChat = await Chat.findAll({
-            where: { id: { [Op.gt]: Number(lastMsgId) }, groupGroupid: req.user.dataValues.groupId },
-            attributes: ["id", "message", "userId"],
-            include: [{
-                model: User,
-                attributes: ["name"]
-            }],
-            group: ["id"]
-        });
-        res.status(200).json({ message: "Success", updatedChat: updatedChat });
-    }
-    catch (err) {
-        console.log(err);
-        res.status(500).json({ message: err });
-    }
-}
-
-exports.createGroup = async (req, res, next) => {
-    const t = await sequelize.transaction();
-    try {
-        const groupName = req.body.groupName;
-        if (!groupName) {
-            return res.status(400).json({ message: "Bad parameters" });
-        }
-
-        // const result = await req.user.createGroup({ groupname: groupName, creator: req.user.id });
-
-        const result = await req.user.createGroup({ groupname: groupName, creator: req.user.id }, { transaction: t })
-
-
-        await Admin.create({ userId: req.user.id, groupId: result.dataValues.groupid }, { transaction: t })
-
-        t.commit();
-        res.status(200).json({ message: "Success", result: result });
-    }
-    catch (err) {
-        t.rollback();
-        console.log(err);
-        res.status(500).json({ message: err });
-    }
-}
-
-exports.getAllGroups = async (req, res, next) => {
-    const userId = req.user.id; // Get the ID of the logged-in user.
-
-    try {
-        // Fetch all groups associated with the user.
-        const allGroups = await Group.findAll({
-            where: { creator: userId }, // You can adjust this condition based on your logic.
+        // Create a new chat message in the Chat model
+        const chats = await Chat.create({
+            message: textMessage,
+            sender: name,
+            groupId: groupId,
+            userId: req.user.id
         });
 
-        // Fetch the IDs of groups where the user is an admin.
-        const adminGroupIds = await Admin.findAll({
-            where: { userId: userId },
-            attributes: ["groupId"],
-        });
+        // Respond with a success message and the created chat message
+        res.status(201).json({ textMessage: chats, message: 'Successfully sent message' });
 
-        // Create a Set of admin group IDs for faster lookups.
-        const adminGroupIdsSet = new Set(adminGroupIds.map((admin) => admin.groupId));
-
-        // Map the groups to include the 'isAdmin' property.
-        const groupsWithAdminStatus = allGroups.map((group) => ({
-            ...group.toJSON(),
-            isAdmin: adminGroupIdsSet.has(group.id),
-        }));
-
-        res.status(200).json({ message: "success", allGroups: groupsWithAdminStatus });
     } catch (err) {
+        // Handle errors and respond with a 500 Internal Server Error
         console.error(err);
-        res.status(500).json({ message: err });
+        res.status(500).json({ error: 'Internal Server Error' });
     }
-};
+}
 
-
-exports.getGroupToken = async (req, res, next) => {
+// Get old messages from the Chats table based on groupId
+const getMessages = async (req, res) => {
     try {
-        const { id, name } = req.user;
-        const groupId = req.params.groupId || 1;
+        // Extract the groupId from the request parameters
+        const { groupId } = req.params;
 
-        res.status(200).json({ message: "success", token: userServices.generateWebToken(id, name, groupId) });
-    }
+        // Find all chat messages with the specified groupId
+        const textMessages = await Chat.findAll({ where: { groupId } });
 
-    catch (err) {
-        console.log(err);
-        res.status(500).json({ message: err });
-    }
-}
-
-exports.addmember = async (req, res, next) => {
-    const member = req.body.member;
-
-    if (!member) {
-        res.status(400).json({ message: "Bad Parameters" });
-        return
-    }
-    try {
-        const foundUser = await User.findOne({ where: Sequelize.or({ email: member }, { phone: member }) });
-
-        if (!foundUser) {
-            return res.status(404).json({ message: "User Not Found" });
+        // Check if there are any messages
+        if (textMessages.length > 0) {
+            return res.status(202).json({ textMessages });
+        } else {
+            // If there are no messages, return a message indicating that
+            return res.status(201).json({ message: 'There are no previous messages' });
         }
-        else if (foundUser.id == req.user.id) {
-            return res.status(400).json({ message: "You cannot add yourself" });
-        }
-        const ifexists = await GroupMember.findOne({ where: { groupGroupid: req.user.dataValues.groupId, userId: foundUser.id } });
-
-        if (ifexists) {
-            return res.status(400).json({ message: "User already in group" });
-        }
-
-        await GroupMember.create({ groupGroupid: req.user.dataValues.groupId, userId: foundUser.id });
-
-        res.status(200).json({ messgae: "Success" })
-
-    }
-    catch (err) {
-        console.log(err);
-        res.status(500).json({ message: err });
+    } catch (err) {
+        // Handle errors and respond with a 500 Internal Server Error
+        console.error(err);
+        res.status(500).json({ error: 'Internal Server Error' });
     }
 }
 
-exports.viewAllMembers = async (req, res, next) => {
-    const groupid = req.user.dataValues.groupId;
-
-    const p1 = new Promise((resolve, reject) => {
-        resolve(
-            req.user.getGroups({
-                where: { groupid: groupid },
-                include: [{
-                    model: User,
-                    attributes: ["id", "name"]
-                }],
-                group: ["id"]
-            })
-        )
-    })
-
-    const p2 = new Promise((resolve, reject) => {
-        resolve(Admin.findAll({ where: { groupId: groupid } }))
-    })
-
-    const result = await Promise.all([p1, p2]);
-
-    res.status(200).json({ messgae: "Success", members: result, myId: req.user.id })
-
+// Export the postMessage and getMessages functions for use in other parts of the application
+module.exports = {
+    postMessage,
+    getMessages,
 }
-
-exports.addAdmin = async (req, res, next) => {
-    const userid = req.params.userid;
-    const groupid = req.user.dataValues.groupId;
-
-    await Admin.create({ userId: userid, groupId: groupid });
-    res.status(200).json({ message: "Success" });
-}
-
-exports.removeMember = async (req, res, next) => {
-    const userid = req.params.userid;
-    const groupid = req.user.dataValues.groupId;
-    const t = await sequelize.transaction();
-    try {
-        // const ifIamAdmin = await Admin.findOne({ where: { groupId: groupid, userId: req.user.id } });
-        // const ifMemberIsAdmin=await Admin.findOne({ where: { groupId: groupid, userId: userid } });
-
-        let ifIamAdmin = new Promise((resolve, reject) => {
-            resolve(
-                Admin.findOne({ where: { groupId: groupid, userId: req.user.id } })
-            )
-        })
-
-        let ifMemberIsAdmin = new Promise((resolve, reject) => {
-            resolve(
-                Admin.findOne({ where: { groupId: groupid, userId: userid } })
-            )
-        })
-
-        const result = await Promise.all([ifIamAdmin, ifMemberIsAdmin]);
-       [ifIamAdmin,ifMemberIsAdmin]=result;
-       console.log(ifMemberIsAdmin);
-
-        if (req.user.id != userid && !ifIamAdmin) {
-            return res.status(401).json({ message: "Unauthorised" })
-        }
-
-        await GroupMember.destroy({ where: { groupGroupid: groupid, userId: userid } }, { transaction: t });
-
-
-        if (ifMemberIsAdmin) {
-            await ifAdmin[0].destroy({ transaction: t })
-        }
-        await t.commit();
-    }
-    catch (err) {
-        await t.rollback();
-        console.log(err);
-        res.status(500).json({ message: err });
-    }
-}
-
-exports.deleteGroup = async (req, res, next) => {
-    const groupIdToDelete = req.params.groupId; // Extract the group ID from the request parameters.
-
-    try {
-        // Fetch the group to be deleted.
-        const group = await Group.findByPk(groupIdToDelete);
-
-        if (!group) {
-            return res.status(404).json({ message: "Group not found" });
-        }
-
-        // Check if the user has the necessary permissions to delete the group.
-        const isAdmin = await Admin.findOne({
-            where: { groupId: groupIdToDelete, userId: req.user.id },
-        });
-
-        if (!isAdmin) {
-            return res.status(401).json({ message: "Unauthorized to delete the group" });
-        }
-
-        // Use a transaction to ensure data consistency during deletion.
-        const t = await sequelize.transaction();
-
-        try {
-            // Delete group members.
-            await GroupMember.destroy({
-                where: { groupGroupid: groupIdToDelete },
-                transaction: t,
-            });
-
-            // Delete group-related chat messages.
-            await Chat.destroy({
-                where: { groupGroupid: groupIdToDelete },
-                transaction: t,
-            });
-
-            // Delete the group itself.
-            await group.destroy({ transaction: t });
-
-            // Commit the transaction.
-            await t.commit();
-
-            res.status(200).json({ message: "Group deleted successfully" });
-        } catch (error) {
-            // Rollback the transaction in case of an error.
-            await t.rollback();
-            console.error("Error deleting group:", error);
-            res.status(500).json({ message: "Error deleting group" });
-        }
-    } catch (error) {
-        console.error("Error fetching group:", error);
-        res.status(500).json({ message: "Error fetching group" });
-    }
-};

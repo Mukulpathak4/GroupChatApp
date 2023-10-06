@@ -1,40 +1,45 @@
-const User = require("../models/userModel");
-const jwt = require("jsonwebtoken");
+// Import necessary modules and models
+const User = require('../models/userModel');
+const Group = require('../models/groupModel');
+const jwt = require('jsonwebtoken');
+require('dotenv').config(); // Load environment variables from a .env file
 
+// Middleware function for authentication
 const authenticate = async (req, res, next) => {
     try {
-        const token = req.header("Authorization");
-        const { id, name, groupId } = jwt.verify(token, process.env.TOKEN_SECRET);
+        // Get the token from the 'Authorization' header in the HTTP request
+        const token = req.header('Authorization');
+        console.log(token); // Log the token to the console for debugging
 
-        console.log("Decoded token:", { id, name, groupId });
+        // Verify the token using the secret from the environment variables
+        const user = jwt.verify(token, process.env.TOKEN_SECRET);
+        const group = jwt.verify(token, process.env.TOKEN_SECRET);
 
-        const userFound = await User.findOne({
-            where: { id: id, name: name },
-            attributes: ["id", "name", "email", "phone"]
-        });
+        // Log user information to the console for debugging
+        console.log('userID >>>>', user.userId, user.name);
 
-        console.log("User found:", userFound);
+        // Find the user and group in the database based on the decoded token
+        const users = await User.findByPk(user.userId);
+        const groups = await Group.findByPk(group.GroupId);
 
-        if (!userFound) {
-            return res.status(404).json({ message: "User not found" });
-        }
+        // Log the retrieved user and group information for debugging
+        console.log('User:', JSON.stringify(users));
+        console.log('Group:', JSON.stringify(groups));
 
-        req.user = userFound;
+        // Attach the user and group information to the request object for future middleware or route handlers
+        req.user = users;
+        req.group = groups;
 
-        // Set the groupId in the user object based on req.params or decoded token.
-        req.user.dataValues.groupId = req.params.groupId || groupId;
-
-        console.log("Updated req.user:", req.user.dataValues);
-
+        // Call the next middleware or route handler
         next();
     } catch (err) {
-        console.error(err);
-        if (err.name === "JsonWebTokenError") {
-            // Handle JWT error - Unauthorized
-            return res.status(401).json({ message: "Unauthorized: Invalid token" });
-        }
-        res.status(500).json({ message: "Internal server error" });
+        // Handle any errors that occur during authentication
+        console.error(err); // Log the error to the console
+        return res.status(401).json({ success: false }); // Return a 401 Unauthorized status response
     }
-};
+}
 
-module.exports = authenticate;
+// Export the authenticate middleware for use in other parts of the application
+module.exports = {
+    authenticate
+}

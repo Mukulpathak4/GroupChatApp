@@ -1,73 +1,58 @@
-const signupButton = document.getElementById("signUpBtn");
+// Get the submit button element by its ID
+const btn = document.getElementById('submit');
 
-const signUpName = document.getElementById("signupName"); // Assuming there's a name input field
-const signUpEmail = document.getElementById("signupEmail");
-const signUpPassword = document.getElementById("signupPassword");
-const signUpPhoneNumber = document.getElementById("signupphonenumber");
+// Add a click event listener to the submit button, which triggers the storeSignupDetails function
+btn.addEventListener('click', storeSignupDetails);
 
+// Function to store user signup details and send them to the server
+async function storeSignupDetails(e) {
+    try {
+        // Prevent the default form submission behavior
+        e.preventDefault();
 
-const loginButton = document.getElementById("signInBtn");
+        // Get user input values from the form
+        const name = document.getElementById('username').value;
+        const email = document.getElementById('email').value;
+        const phoneNumber = document.getElementById('phoneNumber').value;
+        const password = document.getElementById('password').value;
 
-const loginEmail = document.getElementById("loginEmail");
-const loginPassword = document.getElementById("loginPassword");
+        // Create an object to store signup details
+        let signupDetails = {
+            name,
+            email,
+            phoneNumber,
+            password
+        };
 
-function login() {
-  // Create an object with login details from the input fields.
-  const loginDetails = {
-    loginEmail: loginEmail.value, // Get the email from the loginEmail input field
-    loginPassword: loginPassword.value, // Get the password from the loginPassword input field
-  };
+        // Log a message to the console for debugging purposes
+        console.log('Sign-up button clicked');
 
-  // Send a POST request to the server to log in the user.
-  axios
-    .post("http://13.200.99.59    :3000/login", loginDetails)
-    .then((result) => {
-      // Display a success message and store the token in local storage.
-      alert(result.data.message);
-      localStorage.setItem("token", result.data.token);
+        // Send a POST request to the server to create a new user account
+        const response = await axios.post('http://localhost:3000/signup', signupDetails);
 
-      // Redirect to the home page.
-      window.location.href = "/home";
-    })
-    .catch((error) => {
-      if (error.response) {
-        // If the server responds with an error, display the error message.
-        const errorMessage = error.response.data.message;
-        alert(errorMessage);
-      } else {
-        // If there's a network error or other issues, display a generic error message.
-        alert("An error occurred. Please try again later.");
-      }
-    });
+        // Log a success message to the console
+        console.log('Sign-up successful');
+        console.log(response.data.message);
+        console.log(response);
+
+        // Display a success message to the user
+        alert(response.data.message);
+
+        // Update the response message element with a success message and set its color to green
+        document.getElementById('someResponse').textContent = `${response.data.message}`;
+        document.getElementById('someResponse').style.color = 'green';
+
+        // Redirect the user to the login page
+        window.location.href = '../html/login.html';
+    } catch (err) {
+        // Handle errors and display an error message to the user
+        alert(err.response.data.error);
+
+        // Update the response message element with an error message and set its color to red
+        document.getElementById('someResponse').innerHTML = `Error: ${err.response.data.error}`;
+        document.getElementById('someResponse').style.color = 'red';
+
+        // Log the error to the console for debugging purposes
+        console.log(err);
+    }
 }
-
-// Add a click event listener to the login button to trigger the login function.
-loginButton.addEventListener("click", login);
-
-function signup(){
-    const signUpDetails = {
-       name: signUpName.value, // Get the name from the name input field
-       email: signUpEmail.value, // Get the email from the signupEmail input field
-       password: signUpPassword.value, // Get the password from the signupPassword input field
-       phone: signUpPhoneNumber.value
-    };
-
-    axios
-    .post("http://13.200.99.59    :3000/signUp", signUpDetails)
-    .then((result)=>{
-        alert('SignUp Complete.');
-
-        window.location.href = "/";
-    })
-    .catch((error)=>{
-        if(error.response){
-            const errorMessage = error.response.data.message;
-            alert(`Here is error`);
-        }
-        else {
-            alert("Oops Error occurred Try Again.")
-        }
-    });
-}
-
-signupButton.addEventListener("click", signup);

@@ -2,7 +2,7 @@ const Sequelize = require('sequelize');
 
 const sequelize = require('../util/config');
 
-const Chat = sequelize.define('chats', {
+const ArchivedChats = sequelize.define('archived_chats', {
     id: {
       type: Sequelize.INTEGER,
       autoIncrement: true,
@@ -13,4 +13,4 @@ const Chat = sequelize.define('chats', {
     sender: Sequelize.STRING
   });
   
-  module.exports = Chat;
+  module.exports = ArchivedChats;
