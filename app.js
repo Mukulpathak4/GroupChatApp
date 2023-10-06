@@ -82,6 +82,23 @@ io.on("connect", (socket) => {
         console.log(`user is disconnected`);
     })
 });
+// cron job
+cron.schedule('0 0 * * *', async () => {
+    //running every day 
+    try{
+        const chats = await Chats.findAll();
+
+        for(let chat of chats) {
+            await ArchivedChats.create({ message: chat.textmessage, sender: chat.name, groupId: chat.groupId, 
+            userId: chat.userId });
+            console.log('old chats are stored to archieved table');
+            await Chats.destroy({ where:{id:chat.id} });
+            console.log('chats in the chats table are deleted');
+        }
+    } catch(err) {
+        console.log(err);
+    }
+})
 
 sequelize.sync().then(() => {
     server.listen(port);
